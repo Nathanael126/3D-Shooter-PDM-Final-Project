@@ -1,3 +1,10 @@
+# Disclaimer: Some aspects of code are taken from the Ursina Manual and inspired by tutorials from youtube. Ursina
+# Engine has an MIT license, and the other code inspired by the tutorials are provided credit at specific points
+# where said code is used, and given proper credit in the documentation of this project. All Assets not included in
+# the Ursina Engine are original and created by me
+
+# Manual(controls): WASD to move, left mouse button to shoot, r to reload, p to quit
+
 # import libraries
 
 # importing everything from Ursina, including basic models,textures,etc., does not include prefabs
@@ -5,8 +12,6 @@ from ursina import *
 
 # importing the first person controller prefab from Ursina
 from ursina.prefabs.first_person_controller import FirstPersonController
-
-# importing randomizer for use
 import random as r
 
 # import libraries done
@@ -15,15 +20,16 @@ import random as r
 app = Ursina()
 
 # texture loader
-
 Skybox_Texture = load_texture("assets/skybox.png")
 Target_Texture = load_texture("assets/target.png")
 Gun_Texture = load_texture("assets/gun.png")
+
+
 # texture loader done
 
 # classes
 
-# detailed explanation for most of the characteristics will be done in the following class only and additional
+# detailed explanation for most of the characteristics will be done in the following class only. Additional
 # characteristics will be explained in other classes. In Ursina, classes need to be assigned as either Entity, Text,
 # Button, mouse, and raycaster for them to be recognized in the program and have the correct properties
 
@@ -84,6 +90,7 @@ class Target(Entity):
             texture=Target_Texture,
         )
 
+    # simple teleporting function when shot, the target moves away
     def teleport(self):
         self.position = Vec3(r.uniform(-50, 50), r.uniform(0, 5), r.uniform(25, 100))
 
@@ -98,13 +105,15 @@ class Gun(Entity):
             position=Vec3(0, -1, 2),
             model='assets/Gun',
             texture=Gun_Texture,
-            scale=Vec3(1,1,1),
-            rotation=Vec3(0,90,0),
+            scale=Vec3(1, 1, 1),
+            rotation=Vec3(0, 90, 0),
         )
 
-    # shot and idle functions are both for cosmetic purposes representing recoil
+    # shot and idle functions are both for cosmetic purposes representing recoil, inspired by the code in the
+    # tutorial: Creating Minecraft in Python [with the Ursina Engine] (Link:
+    # https://www.youtube.com/watch?v=DHSRaVeQxIk&t=1779s&ab_channel=ClearCode)
     def shot(self):
-        self.position = Vec3(0, -1, 1.5)
+        self.position = Vec3(0, -1, 1.8)
 
     def idle(self):
         self.position = Vec3(0, -1, 2)
@@ -168,7 +177,7 @@ def input(key):
                 scale=Vec3(0.1, 0.1, 0.2),
                 color=color.gray,
                 position=Vec3(0, 0.5, 0),
-                rotation=Vec3(0,-90,0)
+                rotation=Vec3(0, -90, 0)
             )
 
         # an individual update function so that the bullet update function would not interfere the global update
@@ -184,9 +193,9 @@ def input(key):
             # collision check every tick
             hit_info = self.intersects()
             if hit_info.hit:
-
+                print(hit_info.entity)
                 # checks if the collision target is the entity Target, if so adds the point and updates the GUI
-                if hit_info.entity in Target_List:
+                if hit_info.entity in Target_List.values():
                     Points_Count += int(distance(Player, hit_info.entity))
                     Points.text = "Points:" + str(Points_Count)
                     hit_info.entity.teleport()
@@ -200,7 +209,7 @@ def input(key):
 
         # this piece of code was taken directly from the Ursina manual, with few minor adjustments. The code worked
         # better than the ones created by the developer. The adjustments made are changing the speed to a multiple of
-        # 25000, multiplying the speed with time.dt so speed are consistent no matter the frame rate,
+        # 100000, multiplying the speed with time.dt so speed are consistent no matter the frame rate,
         # and the delay/animate time to 3 seconds (code origin: Ursina engine API manual,
         # https://www.ursinaengine.org/cheat_sheet.html#FirstPersonController)
         Bullet.world_parent = scene
@@ -226,6 +235,8 @@ Ammo_Count = 9
 
 # points start at 0
 Points_Count = 0
+
+Target_List = {}
 # basic variables done
 
 # declaring object instances
@@ -234,17 +245,17 @@ Player = FirstPersonController()
 Player.cursor.color = color.white
 Gun = Gun()
 
-target1 = Target(position=Vec3(r.uniform(-50, 50), r.uniform(0, 5), r.uniform(25, 100)), scale=(Vec3(2, 1, 2)))
-target2 = Target(position=Vec3(r.uniform(-50, 50), r.uniform(0, 5), r.uniform(25, 100)), scale=(Vec3(2, 1, 2)))
-target3 = Target(position=Vec3(r.uniform(-50, 50), r.uniform(0, 5), r.uniform(25, 100)), scale=(Vec3(2, 1, 2)))
-Target_List = (target1, target2, target3)
+for x in range(5):
+    Target_List["target"+str(x)] = Target(position=Vec3(r.uniform(-50, 50), r.uniform(0, 5), r.uniform(25, 100)), scale=(Vec3(2, 1, 2)))
 # font is the font that the text uses
 Ammo = Text(text='Ammo:9', position=Vec2(-0.5, -0.4), color=color.white, font=Text.default_font)
 Ammo.create_background()
 Points = Text(text='Points:0000', position=Vec2(-0.7, -0.4), color=color.white, font=Text.default_font)
 Points.create_background()
 
-# double sided is assigning the texture on both sides of the model (inside and outside)
+# double sided is assigning the texture on both sides of the model (inside and outside), inspired by the code in the
+# tutorial: Creating Minecraft in Python [with the Ursina Engine] (Link:
+# https://www.youtube.com/watch?v=DHSRaVeQxIk&t=1779s&ab_channel=ClearCode)
 Skybox = Entity(model='sphere', parent=scene, texture=Skybox_Texture, scale=500, double_sided=True)
 
 # declaring object instances done
