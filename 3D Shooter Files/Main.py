@@ -193,7 +193,6 @@ def input(key):
             # collision check every tick
             hit_info = self.intersects()
             if hit_info.hit:
-                print(hit_info.entity)
                 # checks if the collision target is the entity Target, if so adds the point and updates the GUI
                 if hit_info.entity in Target_List.values():
                     Points_Count += int(distance(Player, hit_info.entity))
